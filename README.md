@@ -18,3 +18,4 @@ You need DrRacket to run this code. It gets the Aheui code input from a file. Yo
 	* ㅊ decision is partially implemented.
 * Needs to be refactored to do things in a more functional way rather than in procedural ways.
 * Error handling for empty stack and queue should be completed.
+* More optimization required.
