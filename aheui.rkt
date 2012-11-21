@@ -1,6 +1,6 @@
 #lang racket
 
-(define filename "snippets/hello-world/hello.puzzlet.aheui")
+(define filename "snippets/fibonacci/fibo.puzzlet.aheui")
 
 (define (read-next-line-iter file)
 	   (let ((line (read-line file)))
@@ -54,6 +54,9 @@
   (define cur-storage 0)
   (define new-storage-no 0)
   (define decision 1)
+  (define temp-value 0)
+  (define temp-storage1 0)
+  (define temp-storage2 0)
   
   (unless (>= pos-y 0) (set! pos-y (+ (vector-length cmds) pos-y)))
   (unless (>= pos-x 0) (set! pos-x (+ (string-length (vector-ref cmds pos-y)) pos-x)))
@@ -72,16 +75,18 @@
        (set! decision 1)
        
        ;for debugging
-       ;  (newline)
-       ;  (display (string-ref (vector-ref cmds pos-y) pos-x))
-       ;  (display pos-x)
-       ;  (display pos-y)
-       ;  (display storage-no)
-       ;  (display storage)
-       ;  (display cmd0)
-       ;  (display cmd1)
-       ;  (display cmd2)
-       ;  (newline)
+       (newline)
+       (display (string-ref (vector-ref cmds pos-y) pos-x))
+       (display " x: ")
+       (display pos-x)
+       (display " y: ")
+       (display pos-y)
+       (display " storage-no: ")
+       (display storage-no)
+       (newline)
+       (display "storage: ")
+       (display storage)
+       (newline)
        
        ((cond ((equal? cmd0 "ㅇ") (void))
               ;exit with error code?
@@ -102,14 +107,18 @@
                  (cond ((= storage-no 21) (vector-set! storage storage-no (reverse (cdr (reverse cur-storage)))))
                        (else (vector-set! storage storage-no (cdr cur-storage))))))
               ((equal? cmd0 "ㅂ") (vector-set! storage storage-no (cons (hash-ref lines cmd2) cur-storage)))
-              ((equal? cmd0 "ㅃ") (vector-set! storage storage-no (cons (car cur-storage) cur-storage)))
+              ((equal? cmd0 "ㅃ") (cond ((= storage-no 21) (vector-set! storage storage-no (reverse (cons (car (reverse cur-storage)) (reverse cur-storage)))))
+                                        (else (vector-set! storage storage-no (cons (car cur-storage) cur-storage)))))
               ((equal? cmd0 "ㅍ") (vector-set! storage storage-no (cons (cadr cur-storage) (cons (car cur-storage) (cddr cur-storage)))))
               ((equal? cmd0 "ㅅ") (set! new-storage-no (hash-ref jongsung-index cmd2)) (void))
               ;what if the storage is empty?
               ((equal? cmd0 "ㅆ") (unless (= (length cur-storage) 0)
-                                   (begin
-                                     (vector-set! storage (hash-ref jongsung-index cmd2) (cons (car cur-storage) (vector-ref storage (hash-ref jongsung-index cmd2))))
-                                     (vector-set! storage storage-no (cdr cur-storage)))))
+                                   (cond ((= storage-no 21) (set! temp-value (car (reverse cur-storage))))
+                                         (else (set! temp-value (car cur-storage))))
+                                   (cond ((= storage-no 21) (vector-set! storage storage-no (reverse (cdr (reverse cur-storage)))))
+                                         (else (vector-set! storage storage-no (cdr cur-storage))))
+                                   
+                                   (vector-set! storage (hash-ref jongsung-index cmd2) (cons temp-value (vector-ref storage (hash-ref jongsung-index cmd2))))))
               ((equal? cmd0 "ㅈ") (if (>= (cadr cur-storage) (car cur-storage)) (vector-set! storage storage-no (cons 1 (cddr cur-storage)))
                                      (vector-set! storage storage-no (cons 0 (cddr cur-storage)))))
               ((equal? cmd0 "ㅊ") (if (= (car cur-storage) 0) (set! decision -1)
