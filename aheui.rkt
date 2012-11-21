@@ -2,7 +2,7 @@
 
 (require racket/list)
 
-(define filename "bottle.aheui")
+(define filename "snippets/quine/quine.puzzlet.aheui")
 
 (define (read-next-line-iter file)
 	   (let ((line (read-line file)))
@@ -101,7 +101,7 @@
 	      ((equal? cmd0 "ㄷ") (vector-set! storage storage-no (cons (+ (cadr cur-storage) (car cur-storage)) (cddr cur-storage))))
 	      ((equal? cmd0 "ㄸ") (vector-set! storage storage-no (cons (* (cadr cur-storage) (car cur-storage)) (cddr cur-storage))))
 	      ((equal? cmd0 "ㅌ") (vector-set! storage storage-no (cons (- (cadr cur-storage) (car cur-storage)) (cddr cur-storage))))
-	      ((equal? cmd0 "ㄴ") (vector-set! storage storage-no (cons (/ (cadr cur-storage) (car cur-storage)) (cddr cur-storage))))
+	      ((equal? cmd0 "ㄴ") (vector-set! storage storage-no (cons (quotient (cadr cur-storage) (car cur-storage)) (cddr cur-storage))))
 	      ((equal? cmd0 "ㄹ") (vector-set! storage storage-no (cons (remainder (cadr cur-storage) (car cur-storage)) (cddr cur-storage))))
 	      ((equal? cmd0 "ㅁ")
 	       (define to-display
