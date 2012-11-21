@@ -1,6 +1,6 @@
 #lang racket
 
-(define filename "snippets/fibonacci/fibo.puzzlet.aheui")
+(define filename "unicode-value.txt")
 
 (define (read-next-line-iter file)
 	   (let ((line (read-line file)))
@@ -75,18 +75,18 @@
        (set! decision 1)
        
        ;for debugging
-       (newline)
-       (display (string-ref (vector-ref cmds pos-y) pos-x))
-       (display " x: ")
-       (display pos-x)
-       (display " y: ")
-       (display pos-y)
-       (display " storage-no: ")
-       (display storage-no)
-       (newline)
-       (display "storage: ")
-       (display storage)
-       (newline)
+;       (newline)
+;       (display (string-ref (vector-ref cmds pos-y) pos-x))
+;       (display " x: ")
+;       (display pos-x)
+;       (display " y: ")
+;       (display pos-y)
+;       (display " storage-no: ")
+;       (display storage-no)
+;       (newline)
+;       (display "storage: ")
+;       (display storage)
+;       (newline)
        
        ((cond ((equal? cmd0 "ㅇ") (void))
               ;exit with error code?
@@ -106,7 +106,8 @@
                        ((equal? cmd2 "ㅎ") (display (integer->char to-display))))
                  (cond ((= storage-no 21) (vector-set! storage storage-no (reverse (cdr (reverse cur-storage)))))
                        (else (vector-set! storage storage-no (cdr cur-storage))))))
-              ((equal? cmd0 "ㅂ") (vector-set! storage storage-no (cons (hash-ref lines cmd2) cur-storage)))
+              ((equal? cmd0 "ㅂ") (cond ((equal? cmd2 "ㅎ") (vector-set! storage storage-no (cons (get-char-value (read-char (current-input-port))) cur-storage)))
+                                        (else (vector-set! storage storage-no (cons (hash-ref lines cmd2) cur-storage)))))
               ((equal? cmd0 "ㅃ") (cond ((= storage-no 21) (vector-set! storage storage-no (reverse (cons (car (reverse cur-storage)) (reverse cur-storage)))))
                                         (else (vector-set! storage storage-no (cons (car cur-storage) cur-storage)))))
               ((equal? cmd0 "ㅍ") (vector-set! storage storage-no (cons (cadr cur-storage) (cons (car cur-storage) (cddr cur-storage)))))
