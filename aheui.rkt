@@ -2,7 +2,7 @@
 
 (require racket/list)
 
-(define filename "snippets/fibonacci/fibo.puzzlet.aheui")
+(define filename "bottle.aheui")
 
 (define (read-next-line-iter file)
 	   (let ((line (read-line file)))
@@ -14,7 +14,7 @@
   (char->integer ch))
 
 (define chosungs #("ㄱ" "ㄲ" "ㄴ" "ㄷ" "ㄸ" "ㄹ" "ㅁ" "ㅂ" "ㅃ" "ㅅ" "ㅆ" "ㅇ" "ㅈ" "ㅉ" "ㅊ" "ㅋ" "ㅌ" "ㅍ" "ㅎ"))
-(define joongsungs #("ㅏ" "ㅐ" "ㅑ" "ㅒ" "ㅓ" "ㅔ" "ㅕ" "ㅖ" "ㅗ" "ㅘ" "ㅛ" "ㅙ" "ㅚ" "ㅜ" "ㅝ" "ㅞ" "ㅟ" "ㅠ" "ㅡ" "ㅢ" "ㅣ"))
+(define joongsungs #("ㅏ" "ㅐ" "ㅑ" "ㅒ" "ㅓ" "ㅔ" "ㅕ" "ㅖ" "ㅗ" "ㅘ" "ㅙ" "ㅚ" "ㅛ" "ㅜ" "ㅝ" "ㅞ" "ㅟ" "ㅠ" "ㅡ" "ㅢ" "ㅣ"))
 (define jongsungs #(" " "ㄱ" "ㄲ" "ㄳ" "ㄴ" "ㄵ" "ㄶ" "ㄷ" "ㄹ" "ㄺ" "ㄻ" "ㄼ" "ㄽ" "ㄾ" "ㄿ" "ㅀ" "ㅁ" "ㅂ" "ㅄ" "ㅅ" "ㅆ" "ㅇ" "ㅈ" "ㅊ" "ㅋ" "ㅌ" "ㅍ" "ㅎ"))
 (define (associate-index i)
   (if (= i (vector-length jongsungs)) '()
@@ -30,15 +30,14 @@
       #t))
 
 (define (extract-char ch)
-;  (newline)
-;  (display "ch: ")
-;  (display ch)
-;  (newline)
-  (define ch-value (get-char-value ch))
+  (define ch-value (- (get-char-value ch) 44032))
+  (define jongsung-value (remainder ch-value 28))
+  (define joongsung-value (remainder (/ (- ch-value jongsung-value) 28) 21))
+  (define chosung-value (/ (- (/ (- ch-value jongsung-value) 28) joongsung-value) 21))
   (vector
-   (vector-ref chosungs (quotient (- ch-value 44032) (* (vector-length joongsungs) (vector-length jongsungs))))
-   (vector-ref joongsungs (quotient (remainder (- ch-value 44032) (* (vector-length joongsungs) (vector-length jongsungs))) (vector-length jongsungs)))
-   (vector-ref jongsungs (remainder (- ch-value 44032) (vector-length jongsungs)))))
+   (vector-ref chosungs chosung-value)
+   (vector-ref joongsungs joongsung-value)
+   (vector-ref jongsungs jongsung-value)))
                      
 (define storage (make-vector 28))
 (vector-fill! storage '())
@@ -65,8 +64,8 @@
   (define current-char (string-ref (vector-ref cmds pos-y) pos-x))
   (if (char-not-in-boundary current-char)
       ;handle characters out of boundary (not a hangul character)
-       (if (= (remainder direction 2) 1) (run-aheui (+ pos-x direction) pos-y pos-x pos-y direction storage-no)
-	     (run-aheui prev-x prev-y pos-x (+ pos-y (/ direction 2)) direction storage-no))
+       (if (= (remainder direction 2) 0) (run-aheui pos-x (+ pos-y (/ direction 2)) pos-x pos-y direction storage-no)
+        (run-aheui (+ pos-x direction) pos-y pos-x pos-y direction storage-no))
        (begin 
        (set! extracted (extract-char current-char))
        (set! cmd0 (vector-ref extracted 0))
@@ -83,12 +82,16 @@
 ;       (display pos-x)
 ;       (display " y: ")
 ;       (display pos-y)
+;       (display " direction: ")
+;       (display direction)
 ;       (display " storage-no: ")
 ;       (display storage-no)
 ;       (newline)
 ;       (display "storage: ")
 ;       (display storage)
 ;       (newline)
+;       
+;       (read-line (current-input-port))
        
        (begin
 	(cond ((equal? cmd0 "ㅇ") (void))
@@ -152,13 +155,15 @@
 	      ((equal? cmd1 "ㅠ") (run-aheui pos-x (+ pos-y (* 2 decision)) pos-x pos-y (* 2 decision) new-storage-no))
 	      ;decision with ㅊ not implemented below here
 	      ((equal? cmd1 "ㅡ")
-	       (if (= (remainder direction 2) 1) (run-aheui (+ pos-x direction) pos-y pos-x pos-y direction new-storage-no)
-		   (run-aheui prev-x prev-y pos-x pos-y (* direction -1) new-storage-no)))
+	       (if (= (remainder direction 2) 0) (run-aheui prev-x prev-y pos-x pos-y (* direction -1) new-storage-no)
+                   (run-aheui (+ pos-x direction) pos-y pos-x pos-y direction new-storage-no)))
 	      ((equal? cmd1 "ㅣ")
 	       (if (= (remainder direction 2) 0) (run-aheui pos-x (+ pos-y (/ direction 2)) pos-x pos-y direction new-storage-no)
 		   (run-aheui prev-x prev-y pos-x pos-y (* direction -1) new-storage-no)))
 	      ((equal? cmd1 "ㅢ") (run-aheui prev-x prev-y pos-x pos-y (* direction -1) new-storage-no))
-	      (else (run-aheui prev-x prev-y pos-x pos-y direction new-storage-no)))))))
+	      (else (if (= (remainder direction 2) 0) (run-aheui pos-x (+ pos-y (/ direction 2)) pos-x pos-y direction new-storage-no)
+                        (run-aheui (+ pos-x direction) pos-y pos-x pos-y direction new-storage-no))))))))
+
 
 (define main (run-aheui 0 0 0 0 1 0))
 (main)
