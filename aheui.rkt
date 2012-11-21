@@ -20,7 +20,7 @@
   (if (= i (vector-length jongsungs)) '()
       (cons (cons (vector-ref jongsungs i) i) (associate-index (+ i 1)))))
 (define jongsung-index (make-hash (associate-index 0)))
-(define lines (make-hash (list  (cons " " 0) (cons "ㄱ" 2) (cons "ㄴ" 2) (cons "ㄷ" 3) (cons "ㄹ" 5) (cons "ㅁ" 4) (cons "ㅂ" 4) (cons "ㅅ" 2) (cons "ㅈ" 3) (cons "ㅊ" 4) (cons "ㅋ" 3) (cons "ㅌ" 4) (cons "ㅍ" 4)
+(define strokes (make-hash (list  (cons " " 0) (cons "ㄱ" 2) (cons "ㄴ" 2) (cons "ㄷ" 3) (cons "ㄹ" 5) (cons "ㅁ" 4) (cons "ㅂ" 4) (cons "ㅅ" 2) (cons "ㅈ" 3) (cons "ㅊ" 4) (cons "ㅋ" 3) (cons "ㅌ" 4) (cons "ㅍ" 4)
                                      (cons "ㄲ" 4) (cons "ㄳ" 4) (cons "ㄵ" 5) (cons "ㄶ" 5) (cons "ㄺ" 7) (cons "ㄻ" 9) (cons "ㄼ" 9) (cons "ㄽ" 7) (cons "ㄾ" 9) (cons "ㄿ" 9) (cons "ㅀ" 8)
                                      (cons "ㅄ" 6) (cons "ㅆ" 4))))
 
@@ -118,7 +118,7 @@
 		 (cond ((= storage-no 21) (vector-set! storage storage-no (drop-right cur-storage 1)))
 		       (else (vector-set! storage storage-no (cdr cur-storage))))))
 	      ((equal? cmd0 "ㅂ") (cond ((equal? cmd2 "ㅎ") (vector-set! storage storage-no (cons (get-char-value (read-char (current-input-port))) cur-storage)))
-					(else (vector-set! storage storage-no (cons (hash-ref lines cmd2) cur-storage)))))
+					(else (vector-set! storage storage-no (cons (hash-ref strokes cmd2) cur-storage)))))
 	      ((equal? cmd0 "ㅃ") (unless (= (length cur-storage) 0)
                                    (cond ((= storage-no 21) (vector-set! storage storage-no (reverse (cons (last cur-storage) (reverse cur-storage)))))
                                          (else (vector-set! storage storage-no (cons (car cur-storage) cur-storage))))))
