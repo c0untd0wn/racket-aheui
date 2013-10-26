@@ -23,6 +23,7 @@
 (define strokes (make-hash (list  (cons " " 0) (cons "ㄱ" 2) (cons "ㄴ" 2) (cons "ㄷ" 3) (cons "ㄹ" 5) (cons "ㅁ" 4) (cons "ㅂ" 4) (cons "ㅅ" 2) (cons "ㅈ" 3) (cons "ㅊ" 4) (cons "ㅋ" 3) (cons "ㅌ" 4) (cons "ㅍ" 4)
                                      (cons "ㄲ" 4) (cons "ㄳ" 4) (cons "ㄵ" 5) (cons "ㄶ" 5) (cons "ㄺ" 7) (cons "ㄻ" 9) (cons "ㄼ" 9) (cons "ㄽ" 7) (cons "ㄾ" 9) (cons "ㄿ" 9) (cons "ㅀ" 8)
                                      (cons "ㅄ" 6) (cons "ㅆ" 4))))
+(define required-number-of-elements (make-hash (list (cons "ㄱ" 0) (cons "ㄲ" 0) (cons "ㄴ" 2) (cons "ㄷ" 2) (cons "ㄸ" 2) (cons "ㄹ" 2) (cons "ㅁ" 1) (cons "ㅂ" 0) (cons "ㅃ" 1) (cons "ㅅ" 0) (cons "ㅆ" 1) (cons "ㅇ" 0) (cons "ㅈ" 2) (cons "ㅉ" 0) (cons "ㅊ" 1) (cons "ㅋ" 0) (cons "ㅌ" 2) (cons "ㅍ" 2) (cons "ㅎ" 0))))
 
 (define (char-not-in-boundary ch)
   (define ch-value (get-char-value ch))
@@ -74,8 +75,12 @@
        (set! cur-storage (vector-ref storage storage-no))
        (set! new-storage-no storage-no)
        (set! decision 1)
+       (unless (>= (length cur-storage) (hash-ref required-number-of-elements cmd0)) (set! decision -1))
        
        ;for debugging
+;       (display "storage: ")
+;       (display storage)
+;       (newline)
 ;       (newline)
 ;       (display (string-ref (vector-ref cmds pos-y) pos-x))
 ;       (display " x: ")
@@ -86,9 +91,6 @@
 ;       (display direction)
 ;       (display " storage-no: ")
 ;       (display storage-no)
-;       (newline)
-;       (display "storage: ")
-;       (display storage)
 ;       (newline)
 ;       
 ;       (read-line (current-input-port))
