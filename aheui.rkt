@@ -2,7 +2,7 @@
 
 (require racket/list)
 
-(define filename "snippets/quine/quine.puzzlet.aheui")
+(define filename "snippets/quine/quine.puzzlet.40col.aheui")
 
 (define (read-next-line-iter file)
 	   (let ((line (read-line file)))
@@ -50,19 +50,21 @@
 (define new-storage-no 0)
 (define decision 1)
 (define temp-value 0)
+(define current-char " ")
 (define temp-value2 0)
 (define temp-storage1 0)
 (define temp-storage2 0)
+(define ch-cnt 1)
 (define cmds (list->vector (call-with-input-file filename read-next-line-iter)))
 
 (define (run-aheui pos-x pos-y prev-x prev-y direction storage-no)
   ;define variables that are to be used in this function
   (unless (>= pos-y 0) (set! pos-y (+ (vector-length cmds) pos-y)))
   (unless (< pos-y (vector-length cmds)) (set! pos-y (- pos-y (vector-length cmds))))
-  (unless (>= pos-x 0) (set! pos-x (+ (string-length (vector-ref cmds pos-y)) pos-x)))
-  (unless (< pos-x (string-length (vector-ref cmds pos-y))) (set! pos-x (- pos-x (string-length (vector-ref cmds pos-y)))))
+  (unless (or (>= pos-x 0) (<= prev-x pos-x)) (set! pos-x (+ (string-length (vector-ref cmds pos-y)) pos-x)))
+  (unless (or (< pos-x (string-length (vector-ref cmds pos-y))) (>= prev-x pos-x)) (set! pos-x (- pos-x (string-length (vector-ref cmds pos-y)))))
   
-  (define current-char (string-ref (vector-ref cmds pos-y) pos-x))
+  (unless (>= pos-x (string-length (vector-ref cmds pos-y))) (set! current-char (string-ref (vector-ref cmds pos-y) pos-x)))
   (if (char-not-in-boundary current-char)
       ;handle characters out of boundary (not a hangul character)
        (if (= (remainder direction 2) 0) (run-aheui pos-x (+ pos-y (/ direction 2)) pos-x pos-y direction storage-no)
@@ -75,27 +77,28 @@
        (set! cur-storage (vector-ref storage storage-no))
        (set! new-storage-no storage-no)
        (set! decision 1)
-       (unless (>= (length cur-storage) (hash-ref required-number-of-elements cmd0)) (set! decision -1))
+       ;(unless (>= (length cur-storage) (hash-ref required-number-of-elements cmd0)) (set! decision -1))
        
        ;for debugging
-;       (display "storage: ")
-;       (display storage)
-;       (newline)
-;       (newline)
-;       (display (string-ref (vector-ref cmds pos-y) pos-x))
-;       (display " x: ")
-;       (display pos-x)
-;       (display " y: ")
-;       (display pos-y)
-;       (display " direction: ")
-;       (display direction)
-;       (display " storage-no: ")
-;       (display storage-no)
-;       (newline)
+       ;(display "storage: ")
+       ;(display storage)
+       ;(newline)
+       ;(newline)
+       ;(display current-char)
+       ;(display " x: ")
+       ;(display pos-x)
+       ;(display " y: ")
+       ;(display pos-y)
+       ;(display " direction: ")
+       ;(display direction)
+       ;(display " storage-no: ")
+       ;(display storage-no)
+       ;(newline)
 ;       
 ;       (read-line (current-input-port))
        
        (begin
+        (if (< (length cur-storage) (hash-ref required-number-of-elements cmd0)) (set! decision -1)
 	(cond ((equal? cmd0 "ㅇ") (void))
 	      ;exit with error code?
 	      ((equal? cmd0 "ㅎ") (if (= (length cur-storage) 0) (exit 0)
@@ -154,7 +157,7 @@
 					 (else (vector-set! storage storage-no (cdr cur-storage))))
                               (set! cur-storage (vector-ref storage storage-no))
                               (if (= temp-value 0) (set! decision -1)
-                                  (set! decision 1)))))
+                                  (set! decision 1))))))
 	
 	
 	(cond ((equal? cmd1 "ㅏ") (run-aheui (+ pos-x (* 1 decision)) pos-y pos-x pos-y (* 1 decision) new-storage-no))
