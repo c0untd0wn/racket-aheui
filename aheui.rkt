@@ -1,8 +1,13 @@
 #lang racket/base
 
 (require racket/list)
+(require racket/cmdline)
 
-(define filename "snippets/quine/quine.puzzlet.40col.aheui")
+(define filename
+  (command-line
+   #:args (filename) ; expect one command-line argument: <filename>
+   ; return the argument as a filename to compile
+   filename))
 
 (define (read-next-line-iter file)
 	   (let ((line (read-line file)))
@@ -56,6 +61,7 @@
 (define temp-storage2 0)
 (define ch-cnt 1)
 (define cmds (list->vector (call-with-input-file filename read-next-line-iter)))
+;(display (vector-ref cmds 2))
 
 (define (run-aheui pos-x pos-y prev-x prev-y direction storage-no)
   ;define variables that are to be used in this function
@@ -63,7 +69,10 @@
   (unless (< pos-y (vector-length cmds)) (set! pos-y (- pos-y (vector-length cmds))))
   (unless (or (>= pos-x 0) (<= prev-x pos-x)) (set! pos-x (+ (string-length (vector-ref cmds pos-y)) pos-x)))
   (unless (or (< pos-x (string-length (vector-ref cmds pos-y))) (>= prev-x pos-x)) (set! pos-x (- pos-x (string-length (vector-ref cmds pos-y)))))
-  
+
+  (unless (< pos-x (string-length (vector-ref cmds pos-y)))
+    (if (= (remainder direction 2) 0) (run-aheui pos-x (+ pos-y (/ direction 2)) pos-x pos-y direction new-storage-no)
+                   (run-aheui (+ pos-x direction) pos-y pos-x pos-y direction new-storage-no)))
   (unless (>= pos-x (string-length (vector-ref cmds pos-y))) (set! current-char (string-ref (vector-ref cmds pos-y) pos-x)))
   (if (char-not-in-boundary current-char)
       ;handle characters out of boundary (not a hangul character)
@@ -94,8 +103,8 @@
        ;(display " storage-no: ")
        ;(display storage-no)
        ;(newline)
-;       
-;       (read-line (current-input-port))
+       
+       ;(read-line (current-input-port))
        
        (begin
         (if (< (length cur-storage) (hash-ref required-number-of-elements cmd0)) (set! decision -1)
@@ -103,15 +112,25 @@
 	      ;exit with error code?
 	      ((equal? cmd0 "ㅎ") (if (= (length cur-storage) 0) (exit 0)
 				     (exit (car cur-storage))))
-	      ((equal? cmd0 "ㄷ") (cond ((> (length cur-storage) 1) (vector-set! storage storage-no (cons (+ (cadr cur-storage) (car cur-storage)) (cddr cur-storage))))
+	      ((equal? cmd0 "ㄷ") (cond ((> (length cur-storage) 1)
+                                        (cond ((= storage-no 21) (vector-set! storage storage-no (cons (+ (cadr (reverse cur-storage)) (car (reverse cur-storage))) (cddr (reverse cur-storage)))))
+                                               (else (vector-set! storage storage-no (cons (+ (cadr cur-storage) (car cur-storage)) (cddr cur-storage))))))
                                    ((= (length cur-storage) 1) (vector-set! storage storage-no (list (+ (car cur-storage) (car cur-storage)))))))       
-	      ((equal? cmd0 "ㄸ") (cond ((> (length cur-storage) 1) (vector-set! storage storage-no (cons (* (cadr cur-storage) (car cur-storage)) (cddr cur-storage))))
+	      ((equal? cmd0 "ㄸ") (cond ((> (length cur-storage) 1)
+                                        (cond ((= storage-no 21) (vector-set! storage storage-no (cons (* (cadr (reverse cur-storage)) (car (reverse cur-storage))) (cddr (reverse cur-storage)))))
+                                               (else (vector-set! storage storage-no (cons (* (cadr cur-storage) (car cur-storage)) (cddr cur-storage))))))
                                    ((= (length cur-storage) 1) (vector-set! storage storage-no (list (* (car cur-storage) (car cur-storage)))))))       
-	      ((equal? cmd0 "ㅌ") (cond ((> (length cur-storage) 1) (vector-set! storage storage-no (cons (- (cadr cur-storage) (car cur-storage)) (cddr cur-storage))))
+	      ((equal? cmd0 "ㅌ") (cond ((> (length cur-storage) 1)
+                                        (cond ((= storage-no 21) (vector-set! storage storage-no (cons (- (cadr (reverse cur-storage)) (car (reverse cur-storage))) (cddr (reverse cur-storage)))))
+                                               (else (vector-set! storage storage-no (cons (- (cadr cur-storage) (car cur-storage)) (cddr cur-storage))))))
                                    ((= (length cur-storage) 1) (vector-set! storage storage-no (list (- (car cur-storage) (car cur-storage)))))))       
-	      ((equal? cmd0 "ㄴ") (cond ((> (length cur-storage) 1) (vector-set! storage storage-no (cons (quotient (cadr cur-storage) (car cur-storage)) (cddr cur-storage))))
+	      ((equal? cmd0 "ㄴ") (cond ((> (length cur-storage) 1)
+                                        (cond ((= storage-no 21) (vector-set! storage storage-no (cons (quotient (cadr (reverse cur-storage)) (car (reverse cur-storage))) (cddr (reverse cur-storage)))))
+                                               (else (vector-set! storage storage-no (cons (quotient (cadr cur-storage) (car cur-storage)) (cddr cur-storage))))))
                                    ((= (length cur-storage) 1) (vector-set! storage storage-no (list (quotient (car cur-storage) (car cur-storage)))))))       
-	      ((equal? cmd0 "ㄹ") (cond ((> (length cur-storage) 1) (vector-set! storage storage-no (cons (remainder (cadr cur-storage) (car cur-storage)) (cddr cur-storage))))
+	      ((equal? cmd0 "ㄹ") (cond ((> (length cur-storage) 1)
+                                        (cond ((= storage-no 21) (vector-set! storage storage-no (cons (remainder (cadr (reverse cur-storage)) (car (reverse cur-storage))) (cddr (reverse cur-storage)))))
+                                               (else (vector-set! storage storage-no (cons (remainder (cadr cur-storage) (car cur-storage)) (cddr cur-storage))))))
                                    ((= (length cur-storage) 1) (vector-set! storage storage-no (list (remainder (car cur-storage) (car cur-storage)))))))       
 	      ((equal? cmd0 "ㅁ")
 	       (define to-display
@@ -128,7 +147,9 @@
 	      ((equal? cmd0 "ㅃ") (unless (= (length cur-storage) 0)
                                    (cond ((= storage-no 21) (vector-set! storage storage-no (reverse (cons (last cur-storage) (reverse cur-storage)))))
                                          (else (vector-set! storage storage-no (cons (car cur-storage) cur-storage))))))
-	      ((equal? cmd0 "ㅍ") (unless (<= (length cur-storage) 1) (vector-set! storage storage-no (cons (cadr cur-storage) (cons (car cur-storage) (cddr cur-storage))))))
+	      ((equal? cmd0 "ㅍ") (unless (<= (length cur-storage) 1)
+                                   (cond ((= storage-no 21) (vector-set! storage storage-no (reverse (cons (cadr (reverse cur-storage)) (cons (car (reverse cur-storage)) (cddr (reverse cur-storage)))))))
+                                         (else (vector-set! storage storage-no (cons (cadr cur-storage) (cons (car cur-storage) (cddr cur-storage))))))))
 	      ((equal? cmd0 "ㅅ") (set! new-storage-no (hash-ref jongsung-index cmd2)) (void))
 	      ;what if the storage is empty?
 	      ((equal? cmd0 "ㅆ") (unless (= (length cur-storage) 0)
@@ -170,15 +191,15 @@
 	      ((equal? cmd1 "ㅠ") (run-aheui pos-x (+ pos-y (* 2 decision)) pos-x pos-y (* 2 decision) new-storage-no))
 	      ;decision with ㅊ not implemented below here
 	      ((equal? cmd1 "ㅡ")
-	       (if (= (remainder direction 2) 0) (run-aheui prev-x prev-y pos-x pos-y (* direction -1) new-storage-no)
-                   (run-aheui (+ pos-x direction) pos-y pos-x pos-y direction new-storage-no)))
+	       (if (= (remainder direction 2) 0) (run-aheui (- pos-x (* decision (- pos-x prev-x))) (- pos-y (* decision (- pos-y prev-y))) pos-x pos-y (* decision (* direction -1)) new-storage-no)
+                   (run-aheui (+ pos-x (- pos-x prev-x)) pos-y pos-x pos-y direction new-storage-no)))
 	      ((equal? cmd1 "ㅣ")
-	       (if (= (remainder direction 2) 0) (run-aheui pos-x (+ pos-y (/ direction 2)) pos-x pos-y direction new-storage-no)
-		   (run-aheui prev-x prev-y pos-x pos-y (* direction -1) new-storage-no)))
+	       (if (= (remainder direction 2) 0) (run-aheui pos-x (+ pos-y (- pos-y prev-y)) pos-x pos-y direction new-storage-no)
+		   (run-aheui (- pos-x (* decision (- pos-x prev-x))) (- pos-y (* decision (- pos-y prev-y))) pos-x pos-y (* decision (* direction -1)) new-storage-no)))
 	      ((equal? cmd1 "ㅢ") (run-aheui prev-x prev-y pos-x pos-y (* direction -1) new-storage-no))
-	      (else (if (= (remainder direction 2) 0) (run-aheui pos-x (+ pos-y (/ direction 2)) pos-x pos-y direction new-storage-no)
-                        (run-aheui (+ pos-x direction) pos-y pos-x pos-y direction new-storage-no))))))))
+	      (else (if (= (remainder direction 2) 0) (run-aheui pos-x (+ pos-y (* decision (/ direction 2))) pos-x pos-y direction new-storage-no)
+                        (run-aheui (+ pos-x (* decision direction)) pos-y pos-x pos-y direction new-storage-no))))))))
 
 
-(define main (run-aheui 0 0 0 0 1 0))
+(define main (run-aheui 0 0 0 0 2 0))
 (main)
