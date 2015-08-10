@@ -189,7 +189,6 @@
 	      ((equal? cmd1 "ㅕ") (run-aheui (- pos-x (* 2 decision)) pos-y pos-x pos-y (* -1 decision) new-storage-no))
 	      ((equal? cmd1 "ㅛ") (run-aheui pos-x (- pos-y (* 2 decision)) pos-x pos-y (* -2 decision) new-storage-no))
 	      ((equal? cmd1 "ㅠ") (run-aheui pos-x (+ pos-y (* 2 decision)) pos-x pos-y (* 2 decision) new-storage-no))
-	      ;decision with ㅊ not implemented below here
 	      ((equal? cmd1 "ㅡ")
 	       (if (= (remainder direction 2) 0) (run-aheui (- pos-x (* decision (- pos-x prev-x))) (- pos-y (* decision (- pos-y prev-y))) pos-x pos-y (* decision (* direction -1)) new-storage-no)
                    (run-aheui (+ pos-x (- pos-x prev-x)) pos-y pos-x pos-y direction new-storage-no)))
