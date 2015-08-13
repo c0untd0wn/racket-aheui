@@ -22,7 +22,7 @@ aheui YOUR_AHEUI_CODE
 is also possible.
 
 ## Test
-This implementation passes all tests except logo. logo.aheui takes so long that even I didn't have enough patience to wait for it.
+This implementation passes all tests. logo.aheui took approximately 25 minutes on my 2012 Macbook Air.
 
 To run tests using [Aheui snippets](https://github.com/aheui/snippets), create executable from DrRacket.
 
