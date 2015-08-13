@@ -16,7 +16,8 @@
                )))
 
 (define (get-char-value ch)
-  (char->integer ch))
+  (if (eof-object? ch) 0
+      (char->integer ch)))
 
 (define chosungs #("ㄱ" "ㄲ" "ㄴ" "ㄷ" "ㄸ" "ㄹ" "ㅁ" "ㅂ" "ㅃ" "ㅅ" "ㅆ" "ㅇ" "ㅈ" "ㅉ" "ㅊ" "ㅋ" "ㅌ" "ㅍ" "ㅎ"))
 (define joongsungs #("ㅏ" "ㅐ" "ㅑ" "ㅒ" "ㅓ" "ㅔ" "ㅕ" "ㅖ" "ㅗ" "ㅘ" "ㅙ" "ㅚ" "ㅛ" "ㅜ" "ㅝ" "ㅞ" "ㅟ" "ㅠ" "ㅡ" "ㅢ" "ㅣ"))
